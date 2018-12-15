@@ -1,141 +1,262 @@
-\section{Descripción del simulador} 
-\label{xray:method}
 
-La combinación del algoritmo propuesto en esta tesis, y la librería que permite simular rayos X permite crear un simulador para entrenar proyecciones radiológicas. En este simulador, el usuario podrá manipular cualquier variación de anatomía humana (ver sección \ref{posing:req}) y obtendrá de manera inmediata una imagen de rayos X simulada. En este sentido, el usuario podrá cargar cualquier modelo (previamente de ejecutar el proceso previo explicado en la sec. \ref{posing:preprocess}), configurar los parámetros del simulador de rayos X y obtener en tiempo real la imagen médica asociada. De esta manera, los usuarios pueden revisar multitud de escenarios, probar parámetros concretos, focalizarse en errores comunes que se realizan en los entornos reales o enfatizar pequeños detalles. Estudiantes y profesores pueden dedicar todo el tiempo necesario en una herramienta interactiva sin riesgo ninguno frente a la práctica en un entorno real. Además, pueden variar la anatomía  y parámetros que no es posible en los archivos educativos donde solo se encuentran imágenes estáticas. 
 
-La integración de las dos herramientas ha resultado sencilla debido a que su funcionalidad no entra en conflicto con la otra. El proceso previo del algoritmo de posicionamiento se produce de la misma manera, y es en la fase de interacción (sec. \ref{posing:Poses}) donde las mallas superficiales se comparten entre las dos librerías. Gracias a las capacidades de  la arquitectura de las tarjetas gráficas, ambas librerías trabajan sobre el mismo conjunto de datos ya que comparten memoria en \ac{GPU}.
+%A continuación, se presentarán los casos de uso a los que se pretende atender con el simulador desarrollado.
 
-Los resultados visuales se presentan en una interfaz creada a propósito para permitir al usuario interaccionar con el simulador. Por una parte, podrá observar la representación 3D de las mallas superficiales cargadas y adicionalmente podrá observar la imagen de rayos X en todo momento, resultado de la proyección del emisor al detector. Esta proyección podrá ser modificada por el usuario a través del ratón o los botones diseñados para tal efecto. 
 
-La figura \ref{fig:Posesummary} resumen la arquitectura final del simulador que partiendo con la anatomía de entrada, pasando por el proceso previo, los modelos son deformados y se consigue una imagen médica resultado de la configuración actual.
+\section{Courseware}
+\label{xray:courseware}
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=\linewidth]{IMG/summary.png}
-
-\caption{\label{fig:Posesummary} Arquitectura del simulador: i) modelos anatómicos de entrada ii) Proceso previo iii) Interfaz del simulador donde se ha integrado la \emph{selección de poses} con \emph{gVirtualXRay}.
-}
+El módulo \ac{Courseware} es el responsable de encargado de proporcionar las capacidades de entrenamiento al simulador, al hacerse cargo de la gestión de los módulos de posicionamiento y de simulación de rayos X. Proporciona una \ac{IU} que permite la interacción con los distintos módulos y funcionalidad específicamente diseñada para el entrenamiento. \begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{IMG/uiteacher.png}
+    \caption{\ac{IU} del simulador de radiología diagnóstica : (a) Posicionamiento del paciente virtual  (b) Configuración de la máquina de rayos X (c) Configuración de la colimación (d) Configuración de la visibilidad y propiedades físicas (e) Posicionamiento de los marcadores de referencia y ventana donde se observa la radiografía}
+    \label{fig:uiusecase}
 \end{figure}
 
-A continuación, se presentarán los casos de uso a los que se pretende atender con el simulador desarrollado.
+En la figura \ref{fig:uiusecase} se muestra la apariencia de la \ac{IU} y las principales funcionalidades del simulador. En la esquina superior izquierda se localizan los botones para el posicionamiento del paciente virtual. Más abajo, se encuentran los botones que parametrizan la máquina de rayos X. En la esquina inferior izquierda se localiza la configuración de la colimación. En la esquina superior derecha, se encuentra la lista de anatomía presente, donde se podrá modificar su visibilidad o sus propiedades físicas. Finalmente, en la esquina inferior derecha, se muestra la imagen de rayos X en tiempo real junto con el posicionador del marcador de referencia.
 
-
-
-\subsection{Caso de uso: Profesor}
-\label{xray:casodeuso}
-Los profesores imparten sus clases ayudados por presentaciones y siguen una lista de proyecciones radiológicas que quiere mostrar a los estudiantes. En el transcurso de la explicación de una proyección, el profesor puede cargar un modelo anatómico y enseñar interactivamente a realizar la proyección concreta.  Primero, el profesor explica la posición del paciente que debe tener para realizar la radiografía, moviendo las articulaciones que tenga el modelo disponible. A continuación explica cómo conseguir la configuración de la máquina de rayos X que permita conseguir la mejor imagen posible. El profesor puede centrarse en explicar cómo evitar los errores más comunes como una mala posición del centro de proyección, mala posición de marcadores de referencia, colimación pobre o una incorrecta configuración del emisor. Además, pueden realizar proyecciones incorrectas o posiciones incorrectas del paciente con la finalidad de que los estudiantes las identifiquen. Incluso, pueden simular enfermedades como la pancreatitis, piedras en el riñón o cuerpos extraños en la anatomía del paciente.
-
-
-\subsection{Caso de uso: Estudiante}
-
-Los estudiantes pueden usar esta herramienta como material adicional a sus libros y archivos de imágenes. Estos podrían revisar cada proyección explicada en el libro e intentar reproducirla en el simulador. Los estudiantes cargan un modelo anatómico y comienzan posicionando al paciente en su pose correcta. De pie, sentado, tumbado o mover cualquier articulación por separado si es necesario. Los estudiantes deberán configurar los parámetros del emisor de rayos X y centrar la proyección con forma de cruz proyectada por la luz del emisor, tal y como lo harían en un entorno real. Los estudiantes deben prestar atención a la colimación necesaria y poner el marcador de referencia en un sitio adecuado. La imagen médica resultante puede ser almacenada para ser utilizadas con otras intenciones.
-
-
-
-\subsection{Casos de uso: Ejercicios de clase}
-
-Los profesores pueden diseñar un ejercicio de clase en la herramienta. Se elaboran una lista con las proyecciones que se necesitan reforzar o evaluar y la herramienta les pedirá a los estudiantes realizarlas. Los estudiantes abren la aplicación que cargará el modelo anatómico automáticamente y se les solicitará que realicen una serie de proyecciones vistas en clase. Los estudiantes deberán realizar el procedimiento sin ver la imagen de rayos X intentando simular un entorno realista. Cuando el estudiante cree tener una buena proyección, puede obtener la imagen médica y el sistema le preguntará si está de acuerdo o quiere repetirla. Cuando el usuario considere que su proyección es correcta, la herramienta procederá con la siguiente y guardará un conjunto de métricas de evaluación junto con la imagen que serán evaluadas por el profesor. 
-
-
-Por otra parte, el profesor puede realizar una serie de proyecciones y guardar las imágenes obtenidas. Estas imágenes serán presentadas a los estudiantes para que averigüen cual es la proyección que se intenta conseguir y los parámetros que deberían ser usados para conseguir una imagen similar.
+A continuación se describen las funcionalidades más importantes. Primero se explicará como se ha caracterizado el procedimiento (la descripción del procedimiento se puede consultar en la sección \ref{art:xraysim}) y por último las funcionalidades de herramienta de clase y aprendizaje autoguiado.
 
 
 
 
-\subsection{Posicionamiento del modelo anatómico}
+\subsection{Posicionamiento del paciente virtual}
 \label{xray:posing}
-En el diagnóstico por imagen la posición del paciente es esencial para poder obtener la mejor imagen médica reduciendo la cantidad de dosis recibida por el paciente y el tiempo empleado. La comodidad y la seguridad del paciente es fundamental y los radiólogos tienen que estar seguros de como colocar a un paciente para evitar repeticiones y exposiciones adicionales a los rayos X. En esta herramienta, gracias al algoritmo propuesto de posicionamiento, el usuario es capaz de modificar la postura del modelo anatómico cargado con el objetivo de aprender a conseguir una pose correcta. Los usuarios pueden interaccionar con las articulaciones disponibles del modelo virtual. En la figura \ref{fig:pose}, el brazo ha sido posicionado con el objetivo de conseguir una proyección del codo. Se pueden crear posiciones predefinidas por los profesores para que los estudiantes puedan usarlas en el futuro.
 
+En el diagnóstico por imagen la posición del paciente es esencial para poder obtener la mejor imagen médica evitando repeticiones y exposiciones adicionales a los rayos X. La comodidad y la seguridad del paciente es fundamental y los profesionales de radiología tienen que estar seguros de como se posicionan. Como se describe en \cite{carver2012medical,manualpractico}, el usuario debe elegir la posición del paciente (de pie o tumbado). Aunque el simulador no tiene en cuenta efectos como la gravedad, este aspecto es relevante médicamente y es importante en el currículum de los estudiantes.
+
+En este simulador, gracias a la herramienta \ac{TPTVPH}, el usuario es capaz de modificar la postura del modelo anatómico cargado con el objetivo de aprender a conseguir una pose correcta. Los usuarios pueden interaccionar con el simulador a través de la \ac{IU} de tres formas. Se pueden elegir una pose entre una lista posiciones predefinidas anteriormente. Es posible, también, seleccionar y mover una a una las articulaciones de las que disponga el paciente virtual. Por último, se puede estimar una posición utilizando \ac{MoCap} o con dispositivos como Microsoft Kinect. 
+
+En la figura \ref{fig:pose}, el brazo ha sido posicionado con el objetivo de conseguir una proyección lateral de húmero. Cualquier posición seleccionada puede ser almacenada para futuros usos.
+
+
+
+% \begin{figure}
+%      \centering
+% 		\subfigure[]{\includegraphics[width=0.45\linewidth]{IMG/PoseUI.png} A user defines the left arm position via the . \label{subfig:position} }
+% 		\subfigure[]{\includegraphics[width=0.45\linewidth]{IMG/PoseArm.png} Corresponding 3D visualisation where the virtual patient's left arm has been moved accordingly.\label{subfig:US-B}}
+		
+% 		\caption{\label{fig:pose} {An example of virtual patient positioning.}}    
+% \end{figure}
 
 
 \begin{figure}[h]
-\centering
-\includegraphics[width=0.5\linewidth]{IMG/Pose.png}
-\caption{\label{fig:pose}Ejemplo de proyección de codo }
-\end{figure}
+    \begin{subfigure}[b]{0.45\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/PoseUI.png}}
+        \caption{El usuario utiliza los actuadores para definir la posición del brazo izquierdo. \label{subfig:position}}
+    \end{subfigure}
+    \null\hfill
+     \begin{subfigure}[b]{0.45\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/PoseArm.png}}
+        \caption{Escena 3D resultante del paciente virtual con el cambio de posición del brazo izquierdo.\label{subfig:US-B}}
+    \end{subfigure}
+    \caption{\label{fig:pose} Ejemplo del posicionamiento del paciente virtual en el simulador.}
+   \end{figure}
 
-Aunque no haya consecuencias físicas en las imágenes si el paciente se encuentra de pie o tumbado, este aspecto es relevante médicamente y es importante en el currículum de los estudiantes. El usuario puede cambiar de postura en cualquier momento con los botones que se pueden observar en la figura \ref{fig:setup}.
 
 
-
-
-\subsection{Configuración del emisor de rayos X}
+\subsection{Configuración de la máquina de rayos X}
 \label{xray:setupxray}
 
-Los factores de exposición es un aspecto fundamental en el diagnóstico por imagen ya que afecta tanto a la seguridad del paciente como a la calidad de la imagen de radiografía. Una configuración inapropiada del emisor puede producir un mal contraste en la imagen, siendo el objetivo final prevenir repeticiones innecesarias. Los estudiantes deben tener en cuenta que la radiación de los rayos X es absorbida de forma diferente entre los tejidos blandos y densos. Por otra parte, la configuración de la \ac{kvp} o kilovoltaje es un factor influyente en la exposición radiográfica, ya que afecta la calidad del haz. El aumento de \ac{kvp} produce rayos más penetrantes consiguiendo más exposición en la imagen. Si es demasiado alto, resultará en sobre exposición y la imagen resultante será muy oscura. Si es demasiado bajo, la imagen quedará más desenfocada y blanquecina.
+Los factores de exposición es un aspecto fundamental en el diagnóstico por imagen ya que afecta tanto a la seguridad del paciente como a la calidad de la imagen de radiografía. Una configuración inapropiada del emisor puede producir un mal contraste en la imagen, siendo el objetivo final prevenir repeticiones innecesarias.
 
-En la figura \ref{fig:setup}, se puede observar la diferencia entre dos configuraciones del emisor diferentes. El usuario puede jugar con los parámetros que le ayudarán a entender como los cambios en el \ac{kvp} afectan a la imagen de manera inmediata. 
+La simulación de rayos X está definida por varios parámetros donde, lo más importantes, son: el emisor y el detector de rayos X (o chasis), y los modelos anatómicos que serán virtualmente irradiados. 
+\begin{itemize}
+    \item Emisor: definido por su posición, forma y espectro de emisión. Permite simular la forma que tendría la fuente de fotones de una máquina de rayos X (un punto, una línea, un cubo o un conjunto de puntos). Además, se puede configurar su espectro de emisión a través de una lista discreta de protones que tienen la misma o diferentes energías.
+    \item Detector: es definido por un plano con su posición, tamaño, resolución y orientación. El plano se traduce en el número de \emph{píxeles} que tendrá la imagen final (ratio tamaño-resolución), y por consecuencia, definir el número de rayos que simulará la librería. Normalmente, este plano se encuentra perpendicular a la dirección de los rayos, pero no es estrictamente necesario.
+    \item Modelos anatómicos: se utiliza su representación superficial acompañado de sus propiedades físicas. Estas propiedades se pueden definir a través de su composición química (porcentaje de átomos de determinado elemento químico) o por su radio-densidad definida por la escala \emph{Hounsfield}. Esta escala es más habitual en entornos médicos. La conversión entre las dos definiciones es posible gracias a \cite{Schneider2000}. Las propiedades físicas de las mallas superficiales son usadas para calcular los coeficientes que se usarán en la ley de atenuación para cada espectro del haz incidente. La correspondencia entre ellos se puede consultar en la base de datos \emph{XCOM} \cite{XCOM}.
+\end{itemize}
 
+Además de los parámetros que configuran la librería \emph{gVirtualXRay}, se han desarrollado los aspectos más importantes y significativos necesarios para la correcta caracterización del procedimiento de radiología diagnóstica. 
 
+%Centraje
+El centraje y el posicionamiento del paciente son aspectos críticos del procedimiento para colocar correctamente la anatomía objetivo en el centro de la proyección. Esto es fundamental para reducir la cantidad de radiación que recibe el paciente. El radiólogo siempre tiene que asegurarse que la zona objetivo del cuerpo en el centro de la proyección y del panel del detector. Además, el usuario debe seleccionar la distancia que hay entre el emisor de rayos X y el detector (conocido como distancia foco-película).
 
+%colimacion
+La colimación es otro paso fundamental del procedimiento. Es la técnica de limitar la proyección del haz saliente del emisor con unas placas de plomo. El plomo es un material muy eficaz atenuando la radiación de los rayos X. Esta técnica es importante para limitar el área irradiado de la anatomía del paciente y, por tanto,  mitigar la radiación que recibe el paciente. También reduce la dispersión de la radiación y mejora la calidad de la imagen.
+
+Todos estos parámetros han sido introducidos en el simulador como parte importante del procedimiento, donde los estudiantes o profesores pueden practicar estos conceptos. A través de la interfaz 3D los usuarios centrar con el ratón la luz proyectada desde el emisor y configurar la colimación (ver Fig. \ref{fig:collimation}) o pueden usar los botones de la interfaz para conseguir una buena colocación de la proyección (ver Fig. \ref{fig:setup}).
 
 \begin{figure}[tb]
 \centering
-\includegraphics[width=0.5\linewidth]{IMG/setup.png}
-\caption{\label{fig:setup} Ejemplos distintos de configuración del emisor. Arriba podemos observar sobre exposición y una imagen más oscura. Por otro lado, abajo hay poca exposición que resulta en una imagen borrosa y blanquecina. }
+\includegraphics[width=0.9\linewidth]{IMG/collimation.png}
+\caption{\label{fig:collimation} Ejemplo de colimación para conseguir una imagen limitada al húmero. Se ha reducido la distancia foco-película y la proyección ha sido rotada  45º. }
 \end{figure}
 
-\subsection{Centro de proyección y colimación}
+Otro aspecto fundamental del procedimiento es la configuración energética de la máquina de rayos X. Con el objetivo de evitar errores y repeticiones, los estudiantes deben entender como el emisor de rayos X produce la radiación y que parámetros afectan a la calidad de la imagen. El emisor se compone de un cátodo que produce electrones y un ánodo donde los electrones chocaran. Si los electrones llegan con la suficiente energía, se generarán rayos X en determinada dirección. Un operador puede controlar los paramétros energéticos ( voltaje aplicado al emisor en \ac{kV} y una intensidad en \ac{mAs}) y el tiempo de exposición en fracciones de segundo. El voltaje \ac{kV} controla la energía de los fotones producidos por el emisor. La corriente \ac{mAs} controla la cantidad de fotones producidos en determinado tiempo (segundos). 
+Para el radiodiagnóstico, el ánodo suele estar fabricado con tungsteno. Los voltajes más comúnmente usados se encuentran entre 55-125~\ac{kV}. El correspondiete espectro resultante puede ser simulado por la herramienta \ac{TASMIP}~\cite{Boone1997}. Por cada voltaje entre ese rango, produce una lista de fotones en \ac{keV}. El usuario puede seleccionar el voltaje \ac{kV} objetivo, y \emph{gVirtualXRay} generará el espectro correspondiente.
 
-Posicionar correctamente el centro de la proyección y la colocación del paciente es fundamental para reducir la cantidad de radiación que recibe el paciente. El radiólogo siempre tiene que asegurarse que la zona objetivo del cuerpo en el centro de la proyección y del panel del detector. La colimación es la técnica de limitar la proyección del haz saliente del emisor con unas placas de plomo. Esta técnica es importante para limitar el área objetivo de la anatomía, mitigar la radiación que recibe el paciente, reducir la dispersión de la radiación y mejorar la calidad de la imagen.  
+La variación entre \ac{kV} afecta a las radiografías, ya que la radiación de los rayos X es absorbida de forma diferente entre los tejidos blandos y densos. El nivel de absorción varía según la energía del fotón pero de forma no lineal. 
+Por una parte, si el usuario configura un valor \ac{kV} demasiado bajo, la imagen resultante estará desenfocada y blanquecina. Por el contrario, si el valor \ac{kV} es demasiado alto, la imagen quedara sobre-expuesta resultando en una imagen muy oscura.
 
-Todos estos parámetros han sido introducidos en el simulador, donde los estudiantes o profesores pueden practicar estos conceptos. A través de la interfaz 3D los usuarios pueden mover con el ratón la luz proyectada desde el emisor (ver Fig. \ref{fig:collimation}) o pueden usar los botones de la interfaz para conseguir una buena colocación de la proyección (ver Fig. \ref{fig:setup}).
-
-
-\begin{figure}[tb]
-\centering
-\includegraphics[width=0.5\linewidth]{IMG/collimation.png}
-\caption{\label{fig:collimation} Colimación rotada a 45º para conseguir una imagen colimada del codo.}
-\end{figure}
+En la figura \ref{fig:setup}, se puede observar la diferencia entre dos configuraciones del emisor diferentes. El usuario puede jugar con los parámetros que le ayudarán a entender como los cambios en el \ac{kV} afectan a la imagen de manera inmediata. Hay que destacar, que el comportamiento determinista del algoritmo de simulación, el parámetro de corriente \ac{mAs} no es simulado directamente. Sin embargo, un valor bajo de \ac{mAs} puede ser imitado añadiendo un ruido de \emph{Poisson} a la radiografía resultante.
 
 
-\subsection{Marcas de referencia}
+% \begin{figure}[tb]
+% \centering
+% \includegraphics[width=0.5\linewidth]{IMG/setup.png}
+% \caption{\label{fig:setup} Ejemplos distintos de configuración del emisor. Arriba podemos observar sobre exposición y una imagen más oscura. Por otro lado, abajo hay poca exposición que resulta en una imagen borrosa y blanquecina. }
+% \end{figure}
+
+\begin{figure}[h]
+    \begin{subfigure}[b]{0.9\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/60kvp.png}}
+        \caption{Radiografía obtenida con un valor de 60~\ac{kVp}.  La energía incidente es demasiado baja para penetrar en los tejidos, lo que resulta en una imagen sobre-expuesta.\label{fig:60kvp}}
+    \end{subfigure}
+    
+     \begin{subfigure}[b]{0.9\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/90kvp.png}}
+        \caption{ Radiografía resultante de configurar 90~\ac{kVp}. En esta ocasión, el contraste entre tejidos ha mejorado.\label{fig:90kvp}}
+    \end{subfigure}
+    \caption{Efecto en una radiografía de pecho de la configuración del voltaje del emisor de rayos X. \label{fig:setup}}
+   \end{figure}
+   
+   \todo{Me he dado cuenta que la imagen no coincide con el texto, a la espera de Franck para aclararlo}
+
+
+%\subsection{Centro de proyección y colimación}
+  
+
+
+
+
+
+
+
+\subsection{Marcadores de referencia}
 \label{xray:sidemark}
-Una buena práctica en radiología es colocar una marca de referencia que será visible en la imagen médica. Estos marcadores se utilizan para identificar qué lado del paciente está siendo capturado, con el objetivo de reducir errores y repeticiones. Esta práctica es prácticamente obligatoria debido a evitar que otros médicos puedan errar en la interpretación de la imagen. En el simulador se ha incorporado la funcionalidad para que el usuario pueda posicionar el marcador interactivamente con el ratón. Este marcador será inmediatamente incorporado en la textura del panel que se puede ver en la interfaz 3D y será visible también en las imágenes guardadas. En la figura \ref{fig:side} se puede observar la división de la interfaz donde el usuario puede interaccionar y el resultado en la escena 3D. 
-
-
+Una buena práctica en radiología es colocar un marcador de referencia que será visible en la imagen médica. Estos marcadores se utilizan para identificar qué lado del paciente está siendo capturado. Esta práctica es prácticamente obligatoria debido a evitar que otros médicos puedan errar en la interpretación de la imagen. En el simulador se ha incorporado la funcionalidad para que el usuario pueda posicionar el marcador interactivamente con el ratón. Este marcador será inmediatamente incorporado en la textura del panel que se puede ver en la interfaz 3D y será visible también en las imágenes radiográficas guardadas. En la figura \ref{fig:side} se puede observar la división de la interfaz donde el usuario puede interaccionar y su visualización en la escena 3D. 
 
 \begin{figure}[h]
-\centering
-\includegraphics[width=0.5\linewidth]{IMG/side.png}
-\caption{\label{fig:side} Se puede seleccionar el marcador izquierda o derecha y situarlo en el panel.}
-\end{figure}
+    \begin{subfigure}[b]{0.45\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/Rside.png}}
+        \caption{Marcador de referencia derecho.}
+    \end{subfigure}
+    \null\hfill
+     \begin{subfigure}[b]{0.45\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/Lside.png}}
+        \caption{Marcador de referencia izquierdo.}
+    \end{subfigure}
+    \caption{\label{fig:side} El usuario puede seleccionar y posicionar un marcador de referencia, que se trasladará a la imagen.}
+   \end{figure}
 
 
-\subsection{Variedad de casos}
-\label{xray:variedad}
-Una de las ventajas que presenta este simulador frente a los archivos de imágenes y libros es la posibilidad de modificar la anatomía del paciente. Los usuarios puede ocultar ciertos tejidos en la ventana donde se muestra la escena 3D. De esta manera, el usuario podrá entender donde se sitúan o como se mueven los tejidos que se encuentran dentro de la piel. Incluso, es posible ocultar objetos tanto visualmente como al simulador de rayos X para ver las imágenes resultantes con la ausencia de estos tejidos. 
 
-Otra ventaja que el simulador proporciona es la posibilidad de modificar la anatomía interna y sus propiedades físicas con el objetivo de conseguir más variabilidad. Los usuarios pueden modificar la escala de \emph{Hounsfield} o su composición química para conseguir mostrar el efecto de ciertas enfermedades y su imagen radiológica asociada. Por ejemplo, un usuario puede calcificar un hueso, representar un pulmón colapsado o ilustrar un estómago lleno de aire como se puede ver en la figura \ref{fig:disease}. Es incluso posible, añadir objetos extraños dentro de la anatomía del paciente y permitir al usuario identificarlas desde infinidad de puntos de vista.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.5\linewidth]{IMG/disease.png}
-\caption{\label{fig:disease} Los usuarios pueden simular variedad de casos. A: Aspecto normal. B: Objetos extraños en el estómago. C: Pulmón izquierdo colapsado }
-\end{figure}
-
-\subsection{Ajuste de la imagen}
+\subsection{Manipulación digital de imágenes}
 \label{xray:ajustes}
-En la sección \ref{xray:setupxray}, el usuario puede configurar y familiarizarse con el concepto de \ac{kvp} con el objetivo de mejorar la imagen radiológica. Aun así, actualmente existen detectores digitales en los hospitales modernos que permiten capturar la imagen médica de forma digital. Esta imagen digital se podrá mostrar en un ordenador instantáneamente. Quizás en el futuro, se podrá utilizar diagnósticos asistidos por computador, pero en la actualidad es necesario la intervención humana para interpretar las imágenes resultantes. La ventaja de la imagen digital es la posibilidad de duplicar, almacenar y manipular la imagen médica. Esto permite a los usuarios a manipular la imagen capturada con el objetivo de reducir los errores de sobre-exposición o sub-exposición producido por una mala configuración del emisor. Incluso, se puede conseguir más información de la imagen a través de programas de edición de imágenes que permiten observar detalles mínimos que no puede verse a simple vista.  
+\todo{seguir aquí}
+%En la sección \ref{xray:setupxray}, el usuario puede configurar y familiarizarse con el concepto de \ac{kVp} con el objetivo de mejorar la calidad de la radiografía resultante. 
+En la actualidad, los detectores de los hospitales modernos son digitales y permiten capturar y almacenar la imagen radiológica de forma digital. Esta imagen digital se podrá mostrar en un ordenador instantáneamente. Quizás en el futuro, se podrá utilizar diagnósticos asistidos por computador, pero en la actualidad es necesario la intervención humana para interpretar las imágenes resultantes. La ventaja de la imagen digital es la posibilidad de duplicar, almacenar y manipular la imagen médica. Esto permite, por ejemplo, a los usuarios a manipular la imagen capturada con el objetivo de reducir los errores de sobre-exposición o sub-exposición producido por una mala configuración del emisor. Incluso, se puede conseguir más información de la imagen a través de aplicaciones de edición de imágenes que permiten observar detalles mínimos que no puede verse a simple vista.  
 
-Los usuarios, como pudieran hacerse en la realidad, pueden manipular la imagen obtenida con algunas funcionalidades implementadas en el simulador. Se puede cambiar el brillo y el contraste para enfatizar o remarcar las diferencias entre tejidos. Por otro lado, se han implementado un filtro gamma y un filtro logarítmico con el objetivo de mejorar la imagen capturada. El usuario puede modificar estos parámetros con el ratón y los botones integrados en la interfaz. En la figura \ref{fig:imgmani} muestra un ejemplo de manipulación de la imagen capturada con la misma configuración del emisor de rayos X.
-Finalmente, las imágenes manipuladas se pueden guardar en el disco duro.
+Los usuarios pueden manipular y mejorar la imagen obtenida con algunas funcionalidades implementadas en el simulador. Se puede cambiar el brillo y el contraste para enfatizar o remarcar las diferencias entre tejidos. Por otro lado, se han implementado un filtro gamma y un filtro logarítmico con el objetivo de mejorar la imagen capturada. Es posible también mostrar la imagen negativa o voltearla horizontalmente. El usuario puede modificar estos parámetros con el ratón y los botones integrados en la interfaz. En la figura \ref{fig:imgmani} muestra un ejemplo de manipulación de la misma imagen capturada. . Por último, el usuario podrá elegir almacenar las imágenes manipuladas en el disco duro.
 
+
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=0.5\linewidth]{IMG/imgmanipulation.png}
+% \caption{\label{fig:imgmani} A: Imagen de referencia. B: Imagen en negativo. C: Imagen utilizando filtro Gamma. D: Imagen con filtro logarítmico. }
+% \end{figure}
 
 \begin{figure}[h]
-\centering
-\includegraphics[width=0.5\linewidth]{IMG/imgmanipulation.png}
-\caption{\label{fig:imgmani} A: Imagen de referencia. B: Imagen en negativo. C: Imagen utilizando filtro Gamma. D: Imagen con filtro logarítmico. }
-\end{figure}
+\begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/XRayMaleNormal2.png}}
+        \caption{Imagen de referencia de  \emph{ZygoteBody}$^{TM}$. \label{xraynormal}}
+    \end{subfigure}
+    \null\hfill
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/XrayMaleNegative2.png}}
+        \caption{Imagen en negativo de la imagen \ref{xraynormal}.}
+    \end{subfigure}
+    \null\hfill
+     \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/XRayMaleFilter2.png}}
+        \caption{Imagen con un brillo bajo y un alto contraste.}
+    \end{subfigure}
+    \caption{\label{fig:imgmani}  Ejemplos de la misma proyección después de haber sido manipulado digitalmente.}
+   \end{figure}
 
-\todo{Añado lo de meter ruido en la imagen?}
 
-\subsection{Simulador como herramienta de aprendizaje}
+
+\subsection{Simulador como herramienta de clase}
 \label{xray:sim}
-Con el objetivo de obtener buenas competencias para realizar proyecciones radiológicas, los estudiantes pueden practicar la teoría en el simulador y mejorar su confianza en el procedimiento. En este contexto, los simuladores de \ac{RV} proporcionan el entorno seguro para enseñar o practicar procedimientos peligrosos para el paciente, pero es necesario una aplicación diseñada para guiar y mejorar el proceso de aprendizaje de los estudiantes. El simulador se ha diseñado para que se pueda utilizar de dos formas. 
-Orientado al estudiante, se ha diseñado un modo guiado que dirige al usuario durante el procedimiento y las funcionalidades del simulador. Este modo puede explicar cómo conseguir una buena proyección radiológica y ofrecer ayuda adicional al usuario si lo requiere.
 
-Otro modo es utilizarlo como método de evaluación. Los estudiantes pueden realizar un ejercicio realizado por sus profesores previamente. Los estudiantes son requeridos de realizar proyecciones concretas sin poder visualizar la imagen radiológica inmediatamente. El estudiante debe posicionar al paciente y configurar el emisor de rayos X al igual que haría en un entorno real. De esta forma, cuando estén seguros de su colocación, estos podrán tomar la radiografía. Los profesores pueden permitir repeticiones o no además de que el simulador guardará métricas de evaluación y las imágenes resultantes para que el profesor pueda evaluar al estudiante su desempeño.
+%\subsection{Variedad de casos}
+%\label{xray:variedad}
+Se han desarrollado funcionalidades adicionales, aunque no están directamente relacionadas con el procedimiento,  permite utilizarla como herramienta de apoyo en clase. El profesor no solo podrá replicar las proyecciones mostradas en los archivos de imágenes y libros, sino que el simulador permite generar nuevas situaciones en comparación con los ejemplos estáticos.  %Pero, adicionalmente, podrá generar variaciones en el paciente virtual, modificando las propiedades de la anatomía o 
+Los usuarios puede ocultar ciertos tejidos en la ventana donde se muestra la escena 3D. De esta manera, el usuario podrá entender donde se sitúan o como se mueven los tejidos que se encuentran debajo de la piel. Incluso, es posible ocultar anatomía a la hora de simular la imagen radiográfica. De esta manera, se podría simular las imágenes resultantes con ausencia de ciertos tejidos. 
 
-Antes de utilizar el simulador, el usuario puede revisar material multimedia que ayuda a familiarizarse con los elementos del simulador.
+Otra ventaja que el simulador proporciona es la posibilidad de modificar la anatomía interna y sus propiedades físicas. Los usuarios pueden modificar la escala de \emph{Hounsfield} o su composición química para conseguir mostrar el efecto de ciertas enfermedades y su imagen radiológica asociada. Por ejemplo, un usuario puede calcificar un hueso, representar un pulmón colapsado o ilustrar como se vería un objeto extraño dentro del estómago como se puede ver en la figura \ref{fig:disease}. Esto podrá permitir al usuario visualizar diferentes variaciones desde infinidad de puntos de vista.
+
+
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=0.5\linewidth]{IMG/disease.png}
+% \caption{\label{fig:disease} Los usuarios pueden simular variedad de casos. A: Aspecto normal. B: Objetos extraños en el estómago. C: Pulmón izquierdo colapsado }
+% \end{figure}
+
+\begin{figure}[h]
+\begin{subfigure}[b]{0.3\linewidth}
+        \centering
+\includegraphics[width=\linewidth]{IMG/HVPForeign.png}
+        \caption{Imagen  de \emph{Segmented Inner Organs}\cite{VoxelMan}.}
+    \end{subfigure}
+    \null\hfill
+    \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/HVPNormal.png}}
+        \caption{Objetos extraños en el estómago.}
+    \end{subfigure}
+    \null\hfill
+     \begin{subfigure}[b]{0.3\linewidth}
+        \centering
+        {\includegraphics[width=\linewidth]{IMG/HVPLung.png}}
+        \caption{Simulación de pulmón izquierdo colapsado.}
+    \end{subfigure}
+    \caption{\label{fig:disease} Un usuario puede ilustrar diferentes ejemplos con el mismo paciente virtual.}
+   \end{figure}
+   
+   
+Por otra parte, el profesor puede realizar una serie de proyecciones y guardar las imágenes obtenidas. Estas imágenes serán presentadas a los estudiantes para que averigüen cual es la proyección que se intenta conseguir y los parámetros que deberían ser usados para conseguir una imagen similar.
+
+\subsection{Herramienta de aprendizaje autoguiado}
+
+Con el objetivo de mejorar tanto sus habilidades cognitivas como las no cognitivas para realizar proyecciones radiológicas, los estudiantes pueden practicar la teoría en el simulador y mejorar su confianza en el procedimiento. En este contexto, los simuladores de \ac{RV} proporcionan el entorno seguro para enseñar o practicar procedimientos peligrosos para el paciente, pero es necesario una aplicación diseñada para guiar y mejorar el proceso de aprendizaje de los estudiantes. El simulador se ha diseñado para que se pueda utilizar de dos formas:
+\begin{itemize}
+    \item Orientado al estudiante, se ha diseñado un modo guiado que dirige al usuario durante el procedimiento y las funcionalidades del simulador. Este modo puede explicar cómo conseguir una buena proyección radiológica y ofrecer ayuda adicional al usuario si lo requiere. Antes de utilizar el simulador, el usuario puede revisar material multimedia que ayuda a familiarizarse con los elementos del simulador.
+    
+    \item Como método de evaluación, los estudiantes pueden realizar un ejercicio diseñado por sus profesores previamente. Los estudiantes deben realizar una lista de proyecciones concretas sin poder visualizar la imagen radiológica inmediatamente. El estudiante debe posicionar al paciente y configurar el emisor de rayos X al igual que haría en un entorno real. De esta forma, cuando estén seguros de su colocación, estos podrán tomar la radiografía. Los profesores pueden permitir repeticiones o no. El simulador guardará métricas de evaluación y las imágenes resultantes para que el profesor pueda evaluar al estudiante.
+    
+\end{itemize}
+
+
+
+
+
+% \subsection{Caso de uso: Profesor}
+% \label{xray:casodeuso}
+% Los profesores imparten sus clases ayudados por presentaciones y siguen una lista de proyecciones radiológicas que quiere mostrar a los estudiantes. En el transcurso de la explicación de una proyección, el profesor puede cargar un modelo anatómico y enseñar interactivamente a realizar la proyección concreta.  Primero, el profesor explica la posición del paciente que debe tener para realizar la radiografía, moviendo las articulaciones que tenga el modelo disponible. A continuación explica cómo conseguir la configuración de la máquina de rayos X que permita conseguir la mejor imagen posible. El profesor puede centrarse en explicar cómo evitar los errores más comunes como una mala posición del centro de proyección, mala posición de marcadores de referencia, colimación pobre o una incorrecta configuración del emisor. Además, pueden realizar proyecciones incorrectas o posiciones incorrectas del paciente con la finalidad de que los estudiantes las identifiquen. Incluso, pueden simular enfermedades como la pancreatitis, piedras en el riñón o cuerpos extraños en la anatomía del paciente.
+
+
+% \subsection{Caso de uso: Estudiante}
+
+% Los estudiantes pueden usar esta herramienta como material adicional a sus libros y archivos de imágenes. Estos podrían revisar cada proyección explicada en el libro e intentar reproducirla en el simulador. Los estudiantes cargan un modelo anatómico y comienzan posicionando al paciente en su pose correcta. De pie, sentado, tumbado o mover cualquier articulación por separado si es necesario. Los estudiantes deberán configurar los parámetros del emisor de rayos X y centrar la proyección con forma de cruz proyectada por la luz del emisor, tal y como lo harían en un entorno real. Los estudiantes deben prestar atención a la colimación necesaria y poner el marcador de referencia en un sitio adecuado. La imagen médica resultante puede ser almacenada para ser utilizadas con otras intenciones.
+
+
+
+% \subsection{Casos de uso: Ejercicios de clase}
+
+% Los profesores pueden diseñar un ejercicio de clase en la herramienta. Se elaboran una lista con las proyecciones que se necesitan reforzar o evaluar y la herramienta les pedirá a los estudiantes realizarlas. Los estudiantes abren la aplicación que cargará el modelo anatómico automáticamente y se les solicitará que realicen una serie de proyecciones vistas en clase. Los estudiantes deberán realizar el procedimiento sin ver la imagen de rayos X intentando simular un entorno realista. Cuando el estudiante cree tener una buena proyección, puede obtener la imagen médica y el sistema le preguntará si está de acuerdo o quiere repetirla. Cuando el usuario considere que su proyección es correcta, la herramienta procederá con la siguiente y guardará un conjunto de métricas de evaluación junto con la imagen que serán evaluadas por el profesor. 
+
+
+% Por otra parte, el profesor puede realizar una serie de proyecciones y guardar las imágenes obtenidas. Estas imágenes serán presentadas a los estudiantes para que averigüen cual es la proyección que se intenta conseguir y los parámetros que deberían ser usados para conseguir una imagen similar.
 
